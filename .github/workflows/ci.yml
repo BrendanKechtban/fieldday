@@ -1,0 +1,63 @@
+name: ci-cd
+
+on:
+  push: { branches: [main] }
+  pull_request:
+
+concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:                      
+        image: postgres:16
+        env: { POSTGRES_USER: fd, POSTGRES_PASSWORD: fd, POSTGRES_DB: postgres }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U fd" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://fd:fd@localhost:5432/postgres
+      GAMEDAY_DATABASE_URL: postgres://fd:fd@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Server typecheck + tests (validation, authorization, stubbed integration, calculation, migrations)
+        run: npm run typecheck -w server && npm run test -w server
+      - name: Game Day scenarios (capacity race, rate limits, weather timeout, SSE recovery) against real Postgres
+        run: npm run gameday
+      - name: Web typecheck + tests + build
+        run: npm run typecheck -w web && npm run test -w web && npm run build
+      - name: Dependency audit (production deps; fails on high/critical)
+        run: npm audit --omit=dev --audit-level=high
+
+    needs: test
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trigger staging deploys pinned to this commit
+        run: |
+          curl -fsS -X POST "${{ secrets.RENDER_STAGING_API_HOOK }}&ref=${{ github.sha }}"
+          curl -fsS -X POST "${{ secrets.RENDER_STAGING_WEB_HOOK }}&ref=${{ github.sha }}"
+      - name: Wait until /healthz reports this commit
+        run: scripts/wait-for-build.sh "${{ vars.STAGING_API_URL }}" "${{ github.sha }}"
+      - name: Staging smoke checks
+        run: scripts/smoke.sh "${{ vars.STAGING_API_URL }}" "${{ vars.STAGING_WEB_URL }}"
+
+  deploy-production:
+    needs: deploy-staging
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: production        # configure required reviewers on this environment = manual approval gate
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trigger production deploys pinned to this commit
+        run: |
+          curl -fsS -X POST "${{ secrets.RENDER_PROD_API_HOOK }}&ref=${{ github.sha }}"
+          curl -fsS -X POST "${{ secrets.RENDER_PROD_WEB_HOOK }}&ref=${{ github.sha }}"
+      - run: scripts/wait-for-build.sh "${{ vars.PROD_API_URL }}" "${{ github.sha }}"
+      - run: scripts/smoke.sh "${{ vars.PROD_API_URL }}" "${{ vars.PROD_WEB_URL }}"

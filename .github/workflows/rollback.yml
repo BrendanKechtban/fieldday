@@ -1,0 +1,24 @@
+name: rollback
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment: { description: "staging or production", required: true, type: choice, options: [staging, production] }
+      sha: { description: "Full commit SHA to roll back to", required: true }
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Redeploy the pinned commit
+        env:
+          API_HOOK: ${{ inputs.environment == 'production' && secrets.RENDER_PROD_API_HOOK || secrets.RENDER_STAGING_API_HOOK }}
+          WEB_HOOK: ${{ inputs.environment == 'production' && secrets.RENDER_PROD_WEB_HOOK || secrets.RENDER_STAGING_WEB_HOOK }}
+        run: |
+          curl -fsS -X POST "${API_HOOK}&ref=${{ inputs.sha }}"
+          curl -fsS -X POST "${WEB_HOOK}&ref=${{ inputs.sha }}"
+      - name: Verify the old build is serving
+        run: scripts/wait-for-build.sh "${{ inputs.environment == 'production' && vars.PROD_API_URL || vars.STAGING_API_URL }}" "${{ inputs.sha }}"

@@ -1,0 +1,18 @@
+{
+  "name": "fieldday",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "test": "npm run typecheck -w server && npm run test -w server && npm run typecheck -w web && npm run test -w web",
+    "dev:server": "npm run dev -w server",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w web && npm run build -w server",
+    "gameday": "node scripts/gameday.mjs all",
+    "evidence": "bash scripts/collect-evidence.sh",
+    "cost-model": "node scripts/cost-model.mjs"
+  }
+}
