@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      postgres:                      
+      postgres:
         image: postgres:16
         env: { POSTGRES_USER: fd, POSTGRES_PASSWORD: fd, POSTGRES_DB: postgres }
         ports: ["5432:5432"]
@@ -24,15 +24,17 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
-      - name: Server typecheck + tests (validation, authorization, stubbed integration, calculation, migrations)
+      - name: Server typecheck + tests
         run: npm run typecheck -w server && npm run test -w server
-      - name: Game Day scenarios (capacity race, rate limits, weather timeout, SSE recovery) against real Postgres
+      - name: Game Day scenarios against real Postgres
         run: npm run gameday
       - name: Web typecheck + tests + build
         run: npm run typecheck -w web && npm run test -w web && npm run build
-      - name: Dependency audit (production deps; fails on high/critical)
+      - name: Dependency audit (production deps)
         run: npm audit --omit=dev --audit-level=high
 
+  # Skipped until the repository variable DEPLOY_ENABLED is set to true.
+  deploy-staging:
     needs: test
     if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
@@ -52,7 +54,7 @@ jobs:
     needs: deploy-staging
     if: vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
-    environment: production        # configure required reviewers on this environment = manual approval gate
+    environment: production
     steps:
       - uses: actions/checkout@v4
       - name: Trigger production deploys pinned to this commit
