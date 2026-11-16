@@ -1,4 +1,10 @@
-# ---------------- staging ----------------
+# Render Blueprint: two fully separate environments (own service, own database, own secrets), all on FREE plans.
+# Fill every `sync: false` value in the Render dashboard; they are never committed.
+# Data lives in Neon Postgres (one free Neon project per environment, DATABASE_URL below), NOT on the API's filesystem:
+# a free Render web service has no persistent disk and spins down after 15 idle minutes. See docs/DEPLOYMENT.md "Free-tier rules".
+# Still exactly ONE API instance per environment (in-process rate limits, weather cache and SSE bus; see docs/ARCHITECTURE.md).
+services:
+  # ---------------- staging ----------------
   - type: web
     name: fieldday-api-staging
     runtime: docker
@@ -11,7 +17,7 @@
       - { key: DEPLOY_ENV, value: staging }
       - { key: DATABASE_URL, sync: false }            # secret: the STAGING Neon project's connection string (...?sslmode=require)
       - { key: CORS_ORIGINS, sync: false }            # exactly the staging web origin, e.g. https://staging.example.com
-      - { key: PUBLIC_BASE_URL, sync: false }         # https://api-staging.example.com
+      - { key: PUBLIC_BASE_URL, sync: false }         # https://api-staging.bklabs10.com
       - { key: OIDC_ISSUER, sync: false }
       - { key: OIDC_AUDIENCE, sync: false }
       - { key: OIDC_JWKS_URI, sync: false }
@@ -38,7 +44,7 @@
       - { path: /*, name: X-Content-Type-Options, value: nosniff }
       - { path: /*, name: Referrer-Policy, value: no-referrer }
       - { path: /*, name: Permissions-Policy, value: "geolocation=(), camera=(), microphone=()" }
-      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api-staging.example.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
+      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api-staging.bklabs10.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
 
   # ---------------- production ----------------
   - type: web
@@ -80,4 +86,4 @@
       - { path: /*, name: X-Content-Type-Options, value: nosniff }
       - { path: /*, name: Referrer-Policy, value: no-referrer }
       - { path: /*, name: Permissions-Policy, value: "geolocation=(), camera=(), microphone=()" }
-      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.example.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
+      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.bklabs10.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
