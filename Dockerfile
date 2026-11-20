@@ -18,8 +18,6 @@ COPY web/package.json web/
 RUN npm ci --omit=dev -w server --include-workspace-root=false
 COPY --from=build /app/server/dist server/dist
 COPY --from=build /app/web/dist/mcp-app.html web/dist/mcp-app.html
-ARG BUILD_SHA=dev
-ENV BUILD_SHA=$BUILD_SHA
 USER node
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s CMD node -e "fetch('http://localhost:'+process.env.PORT+'/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
