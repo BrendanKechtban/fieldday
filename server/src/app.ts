@@ -139,7 +139,9 @@ export function createApp(deps: Deps) {
     else if (err instanceof ZodError) { status = 422; code = "validation_error"; message = "Request validation failed"; details = err.issues.map((i) => ({ path: i.path.join("."), message: i.message })); }
     else if ((err as { type?: string })?.type === "entity.parse.failed") { status = 400; code = "bad_request"; message = "Malformed JSON"; }
     else console.error(redact(String((err as Error)?.stack ?? err)));
-    res.status(status).setHeader("Cache-Control", "no-store").json({ error: { code, message, ...(details !== undefined ? { details } : {}), requestId } });
+        // Errors are never cacheable; keep "private" when the route already marked itself private (authenticated routes).
+    const priorCache = String(res.getHeader("Cache-Control") ?? "");
+    res.status(status).setHeader("Cache-Control", priorCache.includes("private") ? "private, no-store" : "no-store").json({ error: { code, message, ...(details !== undefined ? { details } : {}), requestId } });
   });
   return app;
 }

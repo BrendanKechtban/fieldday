@@ -147,6 +147,7 @@ describe("validation, errors and consistency", () => {
     const { app, coordinator } = await setup();
     expect((await request(app).get("/api/events")).headers["cache-control"]).toMatch(/public/);
     expect((await request(app).get("/api/me").set(auth(coordinator))).headers["cache-control"]).toMatch(/no-store/);
+    expect((await request(app).get("/api/me")).headers["cache-control"]).toBe("private, no-store");
   });
 });
 
