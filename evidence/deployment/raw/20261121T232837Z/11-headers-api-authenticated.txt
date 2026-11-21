@@ -1,0 +1,33 @@
+commit:  dbefea7c786a163aa2533afcc0ae78dda786a183
+command: curl -sI https://fieldday-api-prod.onrender.com/api/me
+when:    2026-11-21T23:28:38Z
+-----
+HTTP/2 401 
+date: Sat, 21 Nov 2026 23:28:39 GMT
+content-type: application/json; charset=utf-8
+cache-control: private, no-store
+content-security-policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'none';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline';upgrade-insecure-requests;connect-src 'self' https://fieldday.bklabs10.com
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+etag: W/"78-7DQ+tLZGWSfFq0Ro2DuArprrYqs"
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+rndr-id: 251cc37f-6469-4b07
+server: cloudflare
+strict-transport-security: max-age=31536000; includeSubDomains
+vary: Authorization
+vary: Accept-Encoding
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-render-origin-server: Render
+x-request-id: dcd65694-a7eb-4bf9-8f9a-37e98099cfd3
+x-xss-protection: 0
+cf-cache-status: DYNAMIC
+cf-ray: a5e378d39d4c49ad-ORD
+alt-svc: h3=":443"; ma=86400
+
+-----
+exit code: 0

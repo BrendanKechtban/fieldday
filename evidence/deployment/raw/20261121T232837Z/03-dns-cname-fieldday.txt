@@ -1,0 +1,7 @@
+commit:  dbefea7c786a163aa2533afcc0ae78dda786a183
+command: dig CNAME fieldday.bklabs10.com +short
+when:    2026-11-21T23:28:37Z
+-----
+fieldday-web-prod.onrender.com.
+-----
+exit code: 0

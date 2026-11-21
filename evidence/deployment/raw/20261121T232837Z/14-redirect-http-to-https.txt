@@ -1,0 +1,18 @@
+commit:  dbefea7c786a163aa2533afcc0ae78dda786a183
+command: curl -sI http://fieldday.bklabs10.com/
+when:    2026-11-21T23:28:39Z
+-----
+HTTP/1.1 301 Moved Permanently
+Date: Sat, 21 Nov 2026 23:28:39 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 65
+Connection: keep-alive
+Location: https://fieldday.bklabs10.com/
+cf-cache-status: HIT
+Vary: accept-encoding
+Server: cloudflare
+CF-RAY: a5e378d6dfc20006-ORD
+alt-svc: h3=":443"; ma=86400
+
+-----
+exit code: 0

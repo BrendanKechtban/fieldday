@@ -1,0 +1,25 @@
+commit:  dbefea7c786a163aa2533afcc0ae78dda786a183
+command: curl -sI https://fieldday.bklabs10.com/index.html
+when:    2026-11-21T23:28:38Z
+-----
+HTTP/2 200 
+date: Sat, 21 Nov 2026 23:28:38 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache
+cf-cache-status: MISS
+etag: W/"b0efc5c403c3bfce7520d0f684ab1c86"
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fieldday-api-prod.onrender.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+last-modified: Sat, 21 Nov 2026 23:23:38 UTC
+permissions-policy: geolocation=(), camera=(), microphone=()
+referrer-policy: no-referrer
+rndr-id: 0dec2137-0f3b-4de2
+server: cloudflare
+strict-transport-security: max-age=31536000; includeSubDomains
+vary: Accept-Encoding
+vary: Accept-Encoding
+x-content-type-options: nosniff
+cf-ray: a5e378d0e86ae06f-ORD
+alt-svc: h3=":443"; ma=86400
+
+-----
+exit code: 0

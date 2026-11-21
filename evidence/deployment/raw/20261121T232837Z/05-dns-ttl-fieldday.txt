@@ -1,0 +1,14 @@
+commit:  dbefea7c786a163aa2533afcc0ae78dda786a183
+command: dig fieldday.bklabs10.com +noall +answer
+when:    2026-11-21T23:28:37Z
+-----
+
+; <<>> DiG 9.10.6 <<>> fieldday.bklabs10.com +noall +answer
+;; global options: +cmd
+fieldday.bklabs10.com.	1799	IN	CNAME	fieldday-web-prod.onrender.com.
+fieldday-web-prod.onrender.com.	300 IN	CNAME	gcp-us-west1-1.origin.onrender.com.
+gcp-us-west1-1.origin.onrender.com. 128	IN CNAME gcp-us-west1-1.origin.onrender.com.cdn.cloudflare.net.
+gcp-us-west1-1.origin.onrender.com.cdn.cloudflare.net. 251 IN A	216.24.57.16
+gcp-us-west1-1.origin.onrender.com.cdn.cloudflare.net. 251 IN A	216.24.57.18
+-----
+exit code: 0
