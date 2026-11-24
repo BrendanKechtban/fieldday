@@ -16,6 +16,7 @@ services:
       - { key: OIDC_ISSUER, sync: false }
       - { key: OIDC_AUDIENCE, sync: false }
       - { key: OIDC_JWKS_URI, sync: false }
+      - { key: OIDC_ROLES_CLAIM, value: "https://fieldday.bklabs10.com/roles" }   # Auth0 requires a namespaced custom claim
       - { key: OPENWEATHER_API_KEY, sync: false }     # secret; staging has its own key
       - { key: OTEL_EXPORTER_OTLP_ENDPOINT, sync: false }
       - { key: SEED, value: "1" }                     # synthetic demo data only
@@ -30,6 +31,8 @@ services:
       - { key: VITE_OIDC_CLIENT_ID, sync: false }
       - { key: VITE_OIDC_AUTHORITY, sync: false }
       - { key: VITE_OIDC_SCOPES, sync: false }
+      - { key: VITE_OIDC_AUDIENCE, value: "https://fieldday-api" }
+      - { key: VITE_OIDC_ROLES_CLAIM, value: "https://fieldday.bklabs10.com/roles" }
     routes:
       - { type: rewrite, source: /*, destination: /index.html }
     headers: &web_headers
@@ -40,7 +43,7 @@ services:
       - { path: /*, name: X-Content-Type-Options, value: nosniff }
       - { path: /*, name: Referrer-Policy, value: no-referrer }
       - { path: /*, name: Permissions-Policy, value: "geolocation=(), camera=(), microphone=()" }
-      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fieldday-api-staging.onrender.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
+      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fieldday-api-staging.onrender.com https://dev-w8cs0spu2cm1cvzu.us.auth0.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
 
   # ---------------- production ----------------
   - type: web
@@ -59,6 +62,7 @@ services:
       - { key: OIDC_ISSUER, sync: false }
       - { key: OIDC_AUDIENCE, sync: false }
       - { key: OIDC_JWKS_URI, sync: false }
+      - { key: OIDC_ROLES_CLAIM, value: "https://fieldday.bklabs10.com/roles" }   # Auth0 requires a namespaced custom claim
       - { key: OPENWEATHER_API_KEY, sync: false }
       - { key: OTEL_EXPORTER_OTLP_ENDPOINT, sync: false }
       - { key: SEED, value: "1" }
@@ -73,6 +77,8 @@ services:
       - { key: VITE_OIDC_CLIENT_ID, sync: false }
       - { key: VITE_OIDC_AUTHORITY, sync: false }
       - { key: VITE_OIDC_SCOPES, sync: false }
+      - { key: VITE_OIDC_AUDIENCE, value: "https://fieldday-api" }
+      - { key: VITE_OIDC_ROLES_CLAIM, value: "https://fieldday.bklabs10.com/roles" }
     routes:
       - { type: rewrite, source: /*, destination: /index.html }
     headers:
@@ -83,4 +89,4 @@ services:
       - { path: /*, name: X-Content-Type-Options, value: nosniff }
       - { path: /*, name: Referrer-Policy, value: no-referrer }
       - { path: /*, name: Permissions-Policy, value: "geolocation=(), camera=(), microphone=()" }
-      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fieldday-api-prod.onrender.com https://login.microsoftonline.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }
+      - { path: /*, name: Content-Security-Policy, value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fieldday-api-prod.onrender.com https://dev-w8cs0spu2cm1cvzu.us.auth0.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" }

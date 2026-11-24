@@ -147,7 +147,7 @@ describe("validation, errors and consistency", () => {
     const { app, coordinator } = await setup();
     expect((await request(app).get("/api/events")).headers["cache-control"]).toMatch(/public/);
     expect((await request(app).get("/api/me").set(auth(coordinator))).headers["cache-control"]).toMatch(/no-store/);
-    expect((await request(app).get("/api/me")).headers["cache-control"]).toBe("private, no-store");
+    expect((await request(app).get("/api/me")).headers["cache-control"]).toBe("private, no-store"); // even the 401 on an authenticated route
   });
 });
 
@@ -229,7 +229,9 @@ describe("CORS exact-origin allowlist and security headers", () => {
     expect(ok.headers["access-control-allow-origin"]).toBe("https://app.test");
     const bad = await request(app).get("/api/events").set("Origin", "https://evil.test");
     expect(bad.headers["access-control-allow-origin"]).toBeUndefined();
-    const sub = await request(app).get("/api/events").set("Origin", "https://app.test.evil.test");
+    expect(ok.headers["vary"]).toMatch(/Origin/i);
+    expect(bad.headers["vary"]).toMatch(/Origin/i); // a cached denial must not be served to the allowed origin
+    const sub =await request(app).get("/api/events").set("Origin", "https://app.test.evil.test");
     expect(sub.headers["access-control-allow-origin"]).toBeUndefined();
   });
   it("sets HSTS, CSP, nosniff and hides the framework", async () => {

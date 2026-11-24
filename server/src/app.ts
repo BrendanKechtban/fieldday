@@ -33,6 +33,8 @@ export function createApp(deps: Deps) {
     strictTransportSecurity: { maxAge: 31536000, includeSubDomains: true },
     referrerPolicy: { policy: "no-referrer" },
   }));
+  // Responses differ by Origin, so shared caches must key on it. The cors package sends no Vary when it denies an origin, so set it here for every response.
+  app.use((_req, res, next) => { res.vary("Origin"); next(); });
   // Exact-origin allowlist: requests from any other origin get no CORS headers.
   app.use(cors({
     origin: (origin, cb) => cb(null, !origin || cfg.corsOrigins.includes(origin)),
@@ -139,7 +141,7 @@ export function createApp(deps: Deps) {
     else if (err instanceof ZodError) { status = 422; code = "validation_error"; message = "Request validation failed"; details = err.issues.map((i) => ({ path: i.path.join("."), message: i.message })); }
     else if ((err as { type?: string })?.type === "entity.parse.failed") { status = 400; code = "bad_request"; message = "Malformed JSON"; }
     else console.error(redact(String((err as Error)?.stack ?? err)));
-        // Errors are never cacheable; keep "private" when the route already marked itself private (authenticated routes).
+    // Errors are never cacheable; keep "private" when the route already marked itself private (authenticated routes).
     const priorCache = String(res.getHeader("Cache-Control") ?? "");
     res.status(status).setHeader("Cache-Control", priorCache.includes("private") ? "private, no-store" : "no-store").json({ error: { code, message, ...(details !== undefined ? { details } : {}), requestId } });
   });

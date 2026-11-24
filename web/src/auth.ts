@@ -31,6 +31,7 @@ export async function buildAuthorizeUrl(): Promise<string> {
     client_id: OIDC.clientId, response_type: "code", redirect_uri: OIDC.redirectUri(), scope: OIDC.scopes,
     state, nonce, code_challenge: await challengeFor(verifier), code_challenge_method: "S256", response_mode: "query",
   });
+  if (OIDC.audience) p.set("audience", OIDC.audience);
   return `${OIDC.authorizeUrl}?${p.toString()}`;
 }
 
@@ -68,6 +69,7 @@ export function uiClaims(token: string | null): { sub: string; roles: string[]; 
   if (!token) return { sub: "", roles: [], name: "" };
   try {
     const c = decodeJwtPayload(token);
-    return { sub: String(c.sub ?? ""), roles: Array.isArray(c.roles) ? c.roles.filter((r): r is string => typeof r === "string") : [], name: String(c.name ?? "") };
+    const roles = c[OIDC.rolesClaim];
+    return { sub: String(c.sub ?? ""), roles: Array.isArray(roles) ? roles.filter((r): r is string => typeof r === "string") : [], name: String(c.name ?? "") };
   } catch { return { sub: "", roles: [], name: "" }; }
 }

@@ -5,6 +5,8 @@ export interface Config {
   issuer: string;
   audience: string;
   jwksUri: string;
+  /** Name of the access-token claim that holds the user's roles. Entra uses "roles"; Auth0 needs a namespaced URL claim. */
+  rolesClaim: string;
   weatherApiKey: string;
   weatherBaseUrl: string;
   weatherTimeoutMs: number;
@@ -25,6 +27,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     issuer: env.OIDC_ISSUER ?? "",
     audience: env.OIDC_AUDIENCE ?? "",
     jwksUri: env.OIDC_JWKS_URI ?? "",
+    rolesClaim: env.OIDC_ROLES_CLAIM || "roles",
     weatherApiKey: env.OPENWEATHER_API_KEY ?? "",
     weatherBaseUrl: env.OPENWEATHER_BASE_URL ?? "https://api.openweathermap.org/data/2.5/forecast",
     weatherTimeoutMs: Number(env.WEATHER_TIMEOUT_MS ?? 3000),

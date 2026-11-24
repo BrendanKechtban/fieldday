@@ -22,8 +22,10 @@ export function makeKeyResolver(cfg: Pick<Config, "jwksUri">): KeyResolver {
   return createRemoteJWKSet(new URL(cfg.jwksUri));
 }
 
-/** Validates signature (JWKS), issuer, audience and expiry. Roles come from the `roles` claim, scopes from `scp` (Entra) or `scope`. */
-export async function verifyToken(token: string, cfg: Pick<Config, "issuer" | "audience">, keys: KeyResolver): Promise<Actor> {
+type VerifyConfig = Pick<Config, "issuer" | "audience"> & Partial<Pick<Config, "rolesClaim">>;
+
+/** Validates signature (JWKS), issuer, audience and expiry. Roles come from the configured claim (default `roles`), scopes from `scp` (Entra) or `scope` (Auth0). */
+export async function verifyToken(token: string, cfg: VerifyConfig, keys: KeyResolver): Promise<Actor> {
   const { payload } = await jwtVerify(token, keys as JWTVerifyGetKey, {
     issuer: cfg.issuer,
     audience: cfg.audience,
@@ -32,7 +34,8 @@ export async function verifyToken(token: string, cfg: Pick<Config, "issuer" | "a
   });
   if (!payload.sub) throw new HttpError(401, "invalid_token", "Token has no subject");
   const scopeStr = typeof payload.scp === "string" ? payload.scp : typeof payload.scope === "string" ? payload.scope : "";
-  const roles = Array.isArray(payload.roles) ? payload.roles.filter((r): r is string => typeof r === "string") : [];
+  const claim = payload[cfg.rolesClaim || "roles"];
+  const roles = Array.isArray(claim) ? claim.filter((r): r is string => typeof r === "string") : [];
   return { sub: payload.sub, roles, scopes: scopeStr.split(" ").filter(Boolean) };
 }
 
@@ -43,7 +46,7 @@ export function bearer(req: Request): string | null {
   return m?.[1] ?? null;
 }
 
-export function authenticate(cfg: Pick<Config, "issuer" | "audience">, keys: KeyResolver) {
+export function authenticate(cfg: VerifyConfig, keys: KeyResolver) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const t = bearer(req);
     if (!t) return next(new HttpError(401, "unauthenticated", "Missing bearer token"));
